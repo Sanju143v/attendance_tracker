@@ -6,4 +6,5 @@ def hello_world():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host="http://127.0.0.1:5000/",port=5000)
+    
