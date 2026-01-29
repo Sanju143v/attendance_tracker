@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AttendanceTracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar animate-fade-in">
+            <a href="/" class="logo">AttendanceTracker</a>
+            <div>
+                <span style="color: var(--text-muted); margin-right: 1rem;">Welcome, User</span>
+                <a href="/" class="btn btn-outline">Log Out</a>
+            </div>
+        </nav>
+
+        <div class="dashboard-grid">
+            <!-- Sidebar / Control Panel -->
+            <div class="animate-fade-in delay-100">
+                <div class="glass-card action-panel">
+                    <div class="time-display" id="currentTime">--:--:--</div>
+                    <div class="date-display" id="currentDate">LOADING...</div>
+
+                    <div class="attendance-controls">
+                        <button onclick="markAttendance('check-in')" class="btn btn-check-in">Check In</button>
+                        <button onclick="markAttendance('check-out')" class="btn btn-check-out">Check Out</button>
+                    </div>
+                </div>
+
+                <div class="glass-card stats-card">
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayCount">0</div>
+                        <div class="stat-label">Hours Today</div>
+                    </div>
+                    <div style="height: 1px; background: var(--glass-border); margin: 1rem 0;"></div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="weekCount">0</div>
+                        <div class="stat-label">Hours This Week</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content / Logs -->
+            <div class="glass-card animate-fade-in delay-200">
+                <h2 style="margin-bottom: 1.5rem;">Recent Activity</h2>
+                <div class="logs-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsBody">
+                            <!-- Logs will be inserted here by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
