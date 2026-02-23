@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block page_title %}Monthly Report{% endblock %}
+{% block header_actions %}
+<form class="month-picker" method="GET" action="{{ url_for('admin.attendance_report') }}">
+    <select name="month" onchange="this.form.submit()">
+        {% for m in range(1, 13) %}
+        <option value="{{ m }}" {{ 'selected' if month==m }}>{{
+            ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1] }}</option>
+        {% endfor %}
+    </select>
+    <select name="year" onchange="this.form.submit()">
+        {% for y in range(2024, 2028) %}
+        <option value="{{ y }}" {{ 'selected' if year==y }}>{{ y }}</option>
+        {% endfor %}
+    </select>
+</form>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>📈 Monthly Report — {{
+            ['January','February','March','April','May','June','July','August','September','October','November','December'][month-1]
+            }} {{ year }}</h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Present Days</th>
+                        <th>Late Days</th>
+                        <th>Total Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in report_data %}
+                    <tr>
+                        <td style="color: var(--text-primary); font-weight: 500;">{{ item.user.full_name }}</td>
+                        <td>{{ item.user.department }}</td>
+                        <td><span class="status-badge present"><span class="status-dot"></span>{{
+                                item.stats.present_days }}</span></td>
+                        <td><span class="status-badge late"><span class="status-dot"></span>{{ item.stats.late_days
+                                }}</span></td>
+                        <td>{{ item.stats.total_hours }}h</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">📊</div>
+                                <h3>No data for this month</h3>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

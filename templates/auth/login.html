@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Login - AttendEase{% endblock %}
+{% block body %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="logo-icon">📋</div>
+            <h1>AttendEase</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            <span>{{ '✅' if category == 'success' else '⚠️' if category == 'warning' else '❌' if category == 'danger'
+                else 'ℹ️' }}</span>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
+            <!-- Role Tabs -->
+            <div class="role-tabs">
+                <button type="button" class="role-tab active" data-role="user" onclick="selectRole('user', this)">
+                    👤 Employee
+                </button>
+                <button type="button" class="role-tab" data-role="admin" onclick="selectRole('admin', this)">
+                    🛡️ Admin
+                </button>
+            </div>
+            <input type="hidden" name="role" id="roleInput" value="user">
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                Sign In →
+            </button>
+        </form>
+
+        <div class="auth-link">
+            Don't have an account? <a href="{{ url_for('auth.signup') }}">Create Account</a>
+        </div>
+
+        <div
+            style="margin-top: 20px; padding: 16px; background: rgba(108,99,255,0.08); border-radius: 8px; font-size: 12px; color: var(--text-muted);">
+            <strong style="color: var(--primary-light);">Demo Admin:</strong> admin@attendance.com / admin123
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectRole(role, btn) {
+        document.getElementById('roleInput').value = role;
+        document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ title|default('Dashboard') }} - AttendEase{% endblock %}
+{% block body %}
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="brand-icon">📋</div>
+                <div>
+                    <h2>AttendEase</h2>
+                    <span>{{ 'Admin Panel' if current_user.is_admin() else 'Employee Portal' }}</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            {% if current_user.is_admin() %}
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="{{ url_for('admin.dashboard') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'admin.dashboard' }}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Management</div>
+                <a href="{{ url_for('admin.manage_users') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'admin.manage_users' }}">
+                    <span class="nav-icon">👥</span> Users
+                    {% if pending_users is defined and pending_users > 0 %}
+                    <span class="badge">{{ pending_users }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('admin.view_attendance') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'admin.view_attendance' }}">
+                    <span class="nav-icon">✅</span> Attendance
+                </a>
+                <a href="{{ url_for('admin.attendance_report') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'admin.attendance_report' }}">
+                    <span class="nav-icon">📈</span> Reports
+                </a>
+                <a href="{{ url_for('admin.manage_leaves') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'admin.manage_leaves' }}">
+                    <span class="nav-icon">📝</span> Leave Requests
+                    {% if pending_leaves is defined and pending_leaves > 0 %}
+                    <span class="badge">{{ pending_leaves }}</span>
+                    {% endif %}
+                </a>
+            </div>
+            {% else %}
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="{{ url_for('user.dashboard') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'user.dashboard' }}">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Attendance</div>
+                <a href="{{ url_for('user.attendance_history') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'user.attendance_history' }}">
+                    <span class="nav-icon">📅</span> My Attendance
+                </a>
+                <a href="{{ url_for('user.leave_request') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'user.leave_request' }}">
+                    <span class="nav-icon">✈️</span> Request Leave
+                </a>
+                <a href="{{ url_for('user.my_leaves') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'user.my_leaves' }}">
+                    <span class="nav-icon">📋</span> My Leaves
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="{{ url_for('user.profile') }}"
+                    class="nav-link {{ 'active' if request.endpoint == 'user.profile' }}">
+                    <span class="nav-icon">⚙️</span> Profile
+                </a>
+            </div>
+            {% endif %}
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">{{ current_user.full_name[0]|upper }}</div>
+                <div class="user-details">
+                    <div class="name">{{ current_user.full_name }}</div>
+                    <div class="role">{{ current_user.role }}</div>
+                </div>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link" style="color: var(--danger); margin-top: 8px;">
+                <span class="nav-icon">🚪</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="header-actions">
+                {% block header_actions %}{% endblock %}
+            </div>
+        </div>
+        <div class="content-body">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                <span>{{ '✅' if category == 'success' else '⚠️' if category == 'warning' else '❌' if category ==
+                    'danger' else 'ℹ️' }}</span>
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Toggle -->
+<button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+{% block extra_js %}{% endblock %}
+{% endblock %}

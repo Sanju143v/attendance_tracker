@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block page_title %}Attendance History{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>📅 Attendance History</h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Working Hours</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records.items %}
+                    <tr>
+                        <td>{{ record.date.strftime('%d %b %Y') if record.date else 'N/A' }}</td>
+                        <td>{{ record.check_in.strftime('%I:%M %p') if record.check_in else '-' }}</td>
+                        <td>{{ record.check_out.strftime('%I:%M %p') if record.check_out else '-' }}</td>
+                        <td>{{ record.working_hours|default(0) }}h</td>
+                        <td><span class="status-badge {{ record.status }}"><span class="status-dot"></span>{{
+                                record.status }}</span></td>
+                        <td>{{ record.notes or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <h3>No attendance records found</h3>
+                                <p>Your attendance history will appear here.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if records.pages > 1 %}
+<div class="pagination">
+    {% if records.has_prev %}
+    <a href="{{ url_for('user.attendance_history', page=records.prev_num) }}">← Previous</a>
+    {% endif %}
+    {% for page_num in records.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+    {% if page_num %}
+    {% if page_num == records.page %}
+    <span class="current">{{ page_num }}</span>
+    {% else %}
+    <a href="{{ url_for('user.attendance_history', page=page_num) }}">{{ page_num }}</a>
+    {% endif %}
+    {% else %}
+    <span>...</span>
+    {% endif %}
+    {% endfor %}
+    {% if records.has_next %}
+    <a href="{{ url_for('user.attendance_history', page=records.next_num) }}">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

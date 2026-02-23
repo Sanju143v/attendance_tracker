@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block page_title %}Leave Requests{% endblock %}
+{% block content %}
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="{{ url_for('admin.manage_leaves', status='pending') }}"
+        class="filter-tab {{ 'active' if status_filter == 'pending' }}">⏳ Pending</a>
+    <a href="{{ url_for('admin.manage_leaves', status='approved') }}"
+        class="filter-tab {{ 'active' if status_filter == 'approved' }}">✅ Approved</a>
+    <a href="{{ url_for('admin.manage_leaves', status='rejected') }}"
+        class="filter-tab {{ 'active' if status_filter == 'rejected' }}">❌ Rejected</a>
+    <a href="{{ url_for('admin.manage_leaves', status='all') }}"
+        class="filter-tab {{ 'active' if status_filter == 'all' }}">All</a>
+</div>
+
+{% if leaves %}
+{% for leave in leaves %}
+<div class="leave-card">
+    <div class="leave-card-header">
+        <div>
+            <h4 style="display: flex; align-items: center; gap: 10px;">
+                <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">{{
+                    leave.user.full_name[0]|upper }}</div>
+                {{ leave.user.full_name }}
+                <span style="color: var(--text-muted); font-weight: 400; font-size: 13px;">— {{
+                    leave.leave_type|capitalize }} Leave</span>
+            </h4>
+        </div>
+        <span class="status-badge {{ leave.status }}"><span class="status-dot"></span>{{ leave.status }}</span>
+    </div>
+    <div class="leave-card-body">
+        <div>
+            <div class="label">Department</div>
+            <div>{{ leave.user.department }}</div>
+        </div>
+        <div>
+            <div class="label">Duration</div>
+            <div>{{ leave.start_date.strftime('%d %b') }} — {{ leave.end_date.strftime('%d %b %Y') }}</div>
+        </div>
+        <div style="grid-column: 1 / -1;">
+            <div class="label">Reason</div>
+            <div>{{ leave.reason }}</div>
+        </div>
+    </div>
+
+    {% if leave.status == 'pending' %}
+    <div class="leave-actions-form">
+        <form method="POST" action="{{ url_for('admin.approve_leave', leave_id=leave.id) }}"
+            style="display: flex; gap: 8px; flex: 1; align-items: center;">
+            <input type="text" name="remarks" placeholder="Add remarks (optional)">
+            <button type="submit" class="btn btn-success btn-sm">✅ Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.reject_leave', leave_id=leave.id) }}"
+            style="display: flex; gap: 8px; align-items: center;">
+            <input type="hidden" name="remarks" value="">
+            <button type="submit" class="btn btn-danger btn-sm">❌ Reject</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if leave.admin_remarks %}
+    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 13px;">
+        <span style="color: var(--text-muted);">Admin remarks:</span>
+        <span style="color: var(--primary-light);">{{ leave.admin_remarks }}</span>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>No leave requests</h3>
+    <p>There are no {{ status_filter }} leave requests.</p>
+</div>
+{% endif %}
+{% endblock %}

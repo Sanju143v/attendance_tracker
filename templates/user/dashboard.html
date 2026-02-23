@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+<!-- Check In/Out Section -->
+<div class="checkin-section">
+    <div class="checkin-time" id="liveTime">--:--:--</div>
+    <div class="checkin-date" id="liveDate">Loading...</div>
+
+    <div class="checkin-actions">
+        {% if not today_attendance %}
+        <form method="POST" action="{{ url_for('user.check_in') }}">
+            <button type="submit" class="btn btn-success btn-lg">
+                ✅ Check In
+            </button>
+        </form>
+        {% elif today_attendance and not today_attendance.check_out %}
+        <form method="POST" action="{{ url_for('user.check_out') }}">
+            <button type="submit" class="btn btn-danger btn-lg">
+                🚪 Check Out
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if today_attendance %}
+    <div class="checkin-status {{ 'checked-out' if today_attendance.check_out else 'checked-in' }}">
+        {% if today_attendance.check_out %}
+        ✅ Checked out at {{ today_attendance.check_out.strftime('%I:%M %p') }} — {{ today_attendance.working_hours }}h
+        worked
+        {% else %}
+        🟢 Checked in at {{ today_attendance.check_in.strftime('%I:%M %p') }}
+        {% if today_attendance.status == 'late' %} <span class="status-badge late"
+            style="margin-left: 8px;">Late</span>{% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-value">{{ month_stats.present_days }}</div>
+        <div class="stat-label">Present Days (This Month)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">⏰</div>
+        <div class="stat-value">{{ month_stats.late_days }}</div>
+        <div class="stat-label">Late Days (This Month)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue">🕐</div>
+        <div class="stat-value">{{ month_stats.total_hours }}</div>
+        <div class="stat-label">Total Hours (This Month)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">📋</div>
+        <div class="stat-value">{{ pending_leaves }}</div>
+        <div class="stat-label">Pending Leave Requests</div>
+    </div>
+</div>
+
+<!-- Recent Attendance -->
+<div class="card">
+    <div class="card-header">
+        <h3>📅 Recent Attendance</h3>
+        <a href="{{ url_for('user.attendance_history') }}" class="btn btn-outline btn-sm">View All →</a>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Hours</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in recent_attendance %}
+                    <tr>
+                        <td>{{ record.date.strftime('%d %b %Y') if record.date else 'N/A' }}</td>
+                        <td>{{ record.check_in.strftime('%I:%M %p') if record.check_in else '-' }}</td>
+                        <td>{{ record.check_out.strftime('%I:%M %p') if record.check_out else '-' }}</td>
+                        <td>{{ record.working_hours|default(0) }}h</td>
+                        <td><span class="status-badge {{ record.status }}"><span class="status-dot"></span>{{
+                                record.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state" style="padding: 40px;">
+                                <div class="empty-icon">📭</div>
+                                <h3>No attendance records yet</h3>
+                                <p>Start by checking in today!</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const date = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('liveTime').textContent = time;
+        document.getElementById('liveDate').textContent = date;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+{% endblock %}

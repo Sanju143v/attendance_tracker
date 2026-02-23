@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block page_title %}My Leaves{% endblock %}
+{% block header_actions %}
+<a href="{{ url_for('user.leave_request') }}" class="btn btn-primary btn-sm">+ Request Leave</a>
+{% endblock %}
+{% block content %}
+
+{% if leaves %}
+{% for leave in leaves %}
+<div class="leave-card">
+    <div class="leave-card-header">
+        <h4 style="text-transform: capitalize;">{{ leave.leave_type }} Leave</h4>
+        <span class="status-badge {{ leave.status }}"><span class="status-dot"></span>{{ leave.status }}</span>
+    </div>
+    <div class="leave-card-body">
+        <div>
+            <div class="label">From</div>
+            <div>{{ leave.start_date.strftime('%d %b %Y') }}</div>
+        </div>
+        <div>
+            <div class="label">To</div>
+            <div>{{ leave.end_date.strftime('%d %b %Y') }}</div>
+        </div>
+        <div style="grid-column: 1 / -1;">
+            <div class="label">Reason</div>
+            <div>{{ leave.reason }}</div>
+        </div>
+        {% if leave.admin_remarks %}
+        <div style="grid-column: 1 / -1;">
+            <div class="label">Admin Remarks</div>
+            <div style="color: var(--primary-light);">{{ leave.admin_remarks }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>No leave requests</h3>
+    <p>You haven't submitted any leave requests yet.</p>
+    <a href="{{ url_for('user.leave_request') }}" class="btn btn-primary" style="margin-top: 16px;">Request Leave</a>
+</div>
+{% endif %}
+{% endblock %}

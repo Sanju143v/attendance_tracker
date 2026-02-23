@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block page_title %}Request Leave{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 600px;">
+    <div class="card-header">
+        <h3>✈️ Submit Leave Request</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('user.leave_request') }}">
+            <div class="form-group">
+                <label for="leave_type">Leave Type</label>
+                <select id="leave_type" name="leave_type" class="form-control" required>
+                    <option value="">Select leave type</option>
+                    <option value="sick">🤒 Sick Leave</option>
+                    <option value="casual">🏖️ Casual Leave</option>
+                    <option value="vacation">✈️ Vacation</option>
+                    <option value="personal">👤 Personal Leave</option>
+                    <option value="emergency">🚨 Emergency Leave</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Reason</label>
+                <textarea id="reason" name="reason" class="form-control"
+                    placeholder="Provide a detailed reason for your leave..." required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+                <a href="{{ url_for('user.my_leaves') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
